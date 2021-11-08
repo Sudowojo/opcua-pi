@@ -47,6 +47,7 @@ async def main():
 
     # Setup our server
     server = Server()
+
     await server.init()
     server.disable_clock()
     server.set_endpoint("opc.tcp://0.0.0.0:4840/freeopcua/server/")
@@ -62,30 +63,20 @@ async def main():
     uri = "github.com/awojnarek/opcua-pi"
     idx = await server.register_namespace(uri)
 
-    # Create a new node type we can instantiate in our address space
-    dev = await server.nodes.base_object_type.add_object_type(idx, "Raspberry Pi")
-    await (await dev.add_variable(idx, "sensor1", 1.0)).set_modelling_rule(True)
-    await (await dev.add_property(idx, "device_id", "0340")).set_modelling_rule(True)
-    ctrl = await dev.add_object(idx, "controller")
-    await ctrl.set_modelling_rule(True)
-    await (await ctrl.add_property(idx, "state", "Idle")).set_modelling_rule(True)
-
-    # Populating our address space
-
-    # create directly some objects and variables
+    # Create directly some objects and variables
     sensorobj = await server.nodes.objects.add_object(idx, "SensorObj")
     humval = await sensorobj.add_variable(idx, "HumidityValue", 0.0)
     tempval = await sensorobj.add_variable(idx, "TemperatureValue", 0.0)
     await humval.set_writable()    # Set MyVariable to be writable by clients
     await tempval.set_writable()    # Set MyVariable to be writable by clients
 
-    # creating a default event object
+    # Creating a default event object
     # The event object automatically will have members for all events properties
     # you probably want to create a custom event type, see other examples
     myevgen = await server.get_event_generator()
     myevgen.event.Severity = 300
 
-    # starting!
+    # Starting!
     async with server:
         print("Available loggers are: ", logging.Logger.manager.loggerDict.keys())
 
