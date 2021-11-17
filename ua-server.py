@@ -51,7 +51,7 @@ async def main():
     await server.init()
     server.disable_clock()
     server.set_endpoint("opc.tcp://0.0.0.0:4840/freeopcua/server/")
-    server.set_server_name("Raspberry Pi Kegerator")
+    server.set_server_name("Raspberry Pi Environmental Monitor")
 
     # Set all possible endpoint policies for clients to connect through
     server.set_security_policy([
@@ -67,14 +67,6 @@ async def main():
     sensorobj = await server.nodes.objects.add_object(idx, "SensorObj")
     humval = await sensorobj.add_variable(idx, "HumidityValue", 0.0)
     tempval = await sensorobj.add_variable(idx, "TemperatureValue", 0.0)
-    await humval.set_writable()    # Set MyVariable to be writable by clients
-    await tempval.set_writable()    # Set MyVariable to be writable by clients
-
-    # Creating a default event object
-    # The event object automatically will have members for all events properties
-    # you probably want to create a custom event type, see other examples
-    myevgen = await server.get_event_generator()
-    myevgen.event.Severity = 300
 
     # Starting!
     async with server:
